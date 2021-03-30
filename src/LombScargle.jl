@@ -74,7 +74,7 @@ function normalize!(P::AbstractVector{<:Real},
 end
 
 normalize(P::AbstractVector{<:Complex}, p::PeriodogramPlan) =
-    normalize!(Float64(real.(abs2.(P))), p.signal, p.YY * p.sumw, length(p.signal), p.noise, p.norm)
+    normalize!(Float64.(real.(abs2.(P))), p.signal, p.YY * p.sumw, length(p.signal), p.noise, p.norm)
 
 function lombscargle(p::PeriodogramPlan) 
     return Periodogram(normalize(_periodogram!(p), p), p.freq, p.times, p.norm)
