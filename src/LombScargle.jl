@@ -46,35 +46,38 @@ include("planning.jl")
 function normalize!(P::AbstractVector{<:Real},
                     signal::AbstractVector{<:Real},
                     psdfactor::Real,
+                    YY::Real,
                     N::Integer,
                     noise_level::Real,
                     normalization::Symbol)
     # CLH edit: I've used a complex Lomb-Scargle plan with :psd normalization as default, but if you're
     # normalizing you're likely trying to compute the periodogram. The following
     # reverses the :psd normalization 
-    P .*= 2 ./ psdfactor
-    if normalization == :standard
+    if normalization == :psd
         return P
-    elseif normalization == :model
-        return P ./= (1 .- P)
-    elseif normalization == :log
-        return P .= -log.(1 .- P)
-    elseif normalization == :psd
-        return P .*= psdfactor ./ 2
-    elseif normalization == :Scargle
-        return P ./= noise_level
-    elseif normalization == :HorneBaliunas
-        return P .*= (N .- 1) ./ 2
-    elseif normalization == :Cumming
-        M = maximum(P)
-        return P .*= (N .- 3) ./ (1 .- M) ./ 2
     else
-        error("normalization \"", string(normalization), "\" not supported")
+      P .*= 2 ./ YY
+      if normalization == :standard
+          return P
+      elseif normalization == :model
+          return P ./= (1 .- P)
+      elseif normalization == :log
+          return P .= -log.(1 .- P)
+      elseif normalization == :Scargle
+          return P ./= noise_level
+      elseif normalization == :HorneBaliunas
+          return P .*= (N .- 1) ./ 2
+      elseif normalization == :Cumming
+          M = maximum(P)
+          return P .*= (N .- 3) ./ (1 .- M) ./ 2
+      else
+          error("normalization \"", string(normalization), "\" not supported")
+      end
     end
 end
 
 normalize(P::AbstractVector{<:Complex}, p::PeriodogramPlan) =
-    normalize!(Float64.(real.(abs2.(P))), p.signal, p.YY * p.sumw, length(p.signal), p.noise, p.norm)
+    normalize!(Float64.(real.(abs2.(P))), p.signal, p.YY * p.sumw, P.YY, length(p.signal), p.noise, p.norm)
 
 function lombscargle(p::PeriodogramPlan) 
     return Periodogram(normalize(_periodogram!(p), p), p.freq, p.times, p.norm)
