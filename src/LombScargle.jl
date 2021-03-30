@@ -83,7 +83,7 @@ function abs2(P::AbstractVector{<:Complex},
                     N::Integer,
                     noise_level::Real,
                     normalization::Symbol)
-  return (Float64.(abs2.(P)), signal, psdfactor, N, noise_level, normalization) 
+  return (Float64.(real.(abs2.(P))), signal, psdfactor, N, noise_level, normalization) 
 end
 
 lombscargle(p::PeriodogramPlan) =
