@@ -89,7 +89,7 @@ function _generalised_lombscargle!(P, freqs, times, y, w, Y, YY, nil)
         YS_τ  -= Y*S_τ
         SS_τ   = 1 - CC_τ - S_τ*S_τ
         CC_τ  -= C_τ*C_τ
-        P[n] = (YC_τ)/sqrt(2*CC_τ) + 1.0im*(YS_τ)/sqrt(2*SS_τ)
+        P[n] = sign(CC_τ)*(YC_τ)/sqrt(abs(2*CC_τ)) + 1.0im*sign(SS_τ)*(YS_τ)/sqrt(abs(2*SS_τ))
     end
     return P
 end
@@ -117,8 +117,8 @@ function _generalised_lombscargle!(P, freqs, times, y, w, YY, nil)
         end
         # P[n] should be (abs2(YC_τ)/CC_τ + abs2(YS_τ)/SS_τ)/YY, but we guard the values of
         # CC_τ and SS_τ in case they're zeros (note that SS_τ = 1 - CC_τ).
-        frac_C = ifelse(iszero(CC_τ), nil, (YC_τ) / sqrt(2*CC_τ))
-        frac_S = ifelse(CC_τ == 1,    nil, (YS_τ) / sqrt(2*(1 - CC_τ)))
+        frac_C = ifelse(iszero(CC_τ), nil, sign(CC_τ)*(YC_τ) / sqrt(abs(2*CC_τ)))
+        frac_S = ifelse(CC_τ == 1,    nil, sign(1 - CC_τ)*(YS_τ) / sqrt(abs(2*(1 - CC_τ))))
         P[n] = (frac_C + 1.0im*frac_S)
     end
     return P
