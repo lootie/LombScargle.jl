@@ -9,9 +9,13 @@
 #
 # License is BSD 3-clause "New" or "Revised".
 #
-### Code:
+# Modified in 2021 by C. Haley so as to return a Lomb-Scargle-like "Fourier
+# Transform" with power spectral density normalization by default.
+#
+### Code
 
-struct GLSPlan{T,A,B<:AbstractVector{T},C,D,E,F,G} <: PeriodogramPlan
+# GLS plan with real and imaginary parts 
+struct GLSPlanComplex{T,A,B<:AbstractVector{T},C,D,E,F,G} <: PeriodogramPlan
     times::A
     signal::B
     freq::C
@@ -24,7 +28,7 @@ struct GLSPlan{T,A,B<:AbstractVector{T},C,D,E,F,G} <: PeriodogramPlan
     P::G
 end
 
-struct GLSPlan_fit_mean{T,A,B<:AbstractVector{T},C,D,E,F,G,H} <: PeriodogramPlan
+struct GLSPlanComplex_fit_mean{T,A,B<:AbstractVector{T},C,D,E,F,G,H} <: PeriodogramPlan
     times::A
     signal::B
     freq::C
@@ -85,7 +89,7 @@ function _generalised_lombscargle!(P, freqs, times, y, w, Y, YY, nil)
         YS_τ  -= Y*S_τ
         SS_τ   = 1 - CC_τ - S_τ*S_τ
         CC_τ  -= C_τ*C_τ
-        P[n] = (abs2(YC_τ)/CC_τ + abs2(YS_τ)/SS_τ)/YY
+        P[n] = (YC_τ)/sqrt(2*CC_τ) + 1.0im*(YS_τ)/sqrt(2*SS_τ)
     end
     return P
 end
@@ -113,9 +117,9 @@ function _generalised_lombscargle!(P, freqs, times, y, w, YY, nil)
         end
         # P[n] should be (abs2(YC_τ)/CC_τ + abs2(YS_τ)/SS_τ)/YY, but we guard the values of
         # CC_τ and SS_τ in case they're zeros (note that SS_τ = 1 - CC_τ).
-        frac_C = ifelse(iszero(CC_τ), nil, abs2(YC_τ) / CC_τ)
-        frac_S = ifelse(CC_τ == 1,    nil, abs2(YS_τ) / (1 - CC_τ))
-        P[n] = (frac_C + frac_S)/YY
+        frac_C = ifelse(iszero(CC_τ), nil, (YC_τ) / sqrt(2*CC_τ)
+        frac_S = ifelse(CC_τ == 1,    nil, (YS_τ) / sqrt(2*(1 - CC_τ))
+        P[n] = (frac_C + 1.0im*frac_S)
     end
     return P
 end
