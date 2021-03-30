@@ -52,7 +52,7 @@ function normalize!(P::AbstractVector{<:Real},
     # CLH edit: I've used a complex Lomb-Scargle plan with :psd normalization as default, but if you're
     # normalizing you're likely trying to compute the periodogram. The following
     # reverses the :psd normalization 
-    P .*= sqrt.(2 ./ psdfactor)
+    P .*= 2 ./ psdfactor
     if normalization == :standard
         return P
     elseif normalization == :model
