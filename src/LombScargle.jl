@@ -43,14 +43,6 @@ include("press-rybicki.jl")
 
 include("planning.jl")
 
-function LSPlan2Pgram(G::GLSPlan)::PeriodogramPlan
-  return Periodogram(Float64.(real.(abs2.(G.P))), G.freq, G.times, G.norm)
-end
-
-function LSPlan2Pgram(G::GLSPlan_fit_mean)::PeriodogramPlan
-  return Periodogram(Float64.(real.(abs2.(G.P))), G.freq, G.times, G.norm)
-end
-
 function normalize!(P::AbstractVector{<:Real},
                     signal::AbstractVector{<:Real},
                     psdfactor::Real,
@@ -81,11 +73,11 @@ function normalize!(P::AbstractVector{<:Real},
     end
 end
 
-normalize!(P::AbstractVector{<:Complex}, p::PeriodogramPlan) =
-    normalize!(P, p.signal, p.YY * p.sumw, length(p.signal), p.noise, p.norm)
+normalize(P::AbstractVector{<:Complex}, p::PeriodogramPlan) =
+    normalize!(Float64(real.(abs2.(P))), p.signal, p.YY * p.sumw, length(p.signal), p.noise, p.norm)
 
 function lombscargle(p::PeriodogramPlan) 
-    return LSPlan2Pgram(normalize!(_periodogram!(p), p), p.freq, p.times, p.norm)
+    return Periodogram(normalize(_periodogram!(p), p), p.freq, p.times, p.norm)
 end
 
 lombscargle(args...; kwargs...) = lombscargle(plan(args...; kwargs...))
