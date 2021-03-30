@@ -43,12 +43,16 @@ include("press-rybicki.jl")
 
 include("planning.jl")
 
-function normalize!(P::AbstractVector{<:AbstractFloat},
+function normalize!(P::AbstractVector{<:Complex},
                     signal::AbstractVector{<:Real},
                     psdfactor::Real,
                     N::Integer,
                     noise_level::Real,
                     normalization::Symbol)
+    # CLH edit: I've used a complex Lomb-Scargle plan with :psd normalization as default, but if you're
+    # normalizing you're likely trying to compute the periodogram. The following
+    # reverses the :psd normalization 
+    P .*= sqrt.(2 ./ psdfactor)
     if normalization == :standard
         return P
     elseif normalization == :model
@@ -69,11 +73,21 @@ function normalize!(P::AbstractVector{<:AbstractFloat},
     end
 end
 
-normalize!(P::AbstractVector{<:AbstractFloat}, p::PeriodogramPlan) =
+normalize!(P::AbstractVector{<:Complex}, p::PeriodogramPlan) =
     normalize!(P, p.signal, p.YY * p.sumw, length(p.signal), p.noise, p.norm)
 
+# CLH: abs2 redefinition for the tuple here.
+function abs2(P::AbstractVector{<:Complex},
+                    signal::AbstractVector{<:Real},
+                    psdfactor::Real,
+                    N::Integer,
+                    noise_level::Real,
+                    normalization::Symbol)
+  return (Float64.(abs2.(P)), signal, psdfactor, N, noise_level, normalization) 
+end
+
 lombscargle(p::PeriodogramPlan) =
-    Periodogram(normalize!(_periodogram!(p), p), p.freq, p.times, p.norm)
+    Periodogram(abs2(normalize!(_periodogram!(p), p)), p.freq, p.times, p.norm)
 
 lombscargle(args...; kwargs...) = lombscargle(plan(args...; kwargs...))
 

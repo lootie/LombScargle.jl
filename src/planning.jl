@@ -147,11 +147,11 @@ plan(times::AbstractVector{<:Real}, signal::AbstractVector{<:Measurement}; kwarg
 """
     LombScargle.plan(times::AbstractVector{<:Real}, signal::AbstractVector{<:Real},
                      [errors::AbstractVector{<:Real}];
-                     normalization::Symbol=:standard,
+                     normalization::Symbol=:psd,
                      noise_level::Real=1,
                      center_data::Bool=true,
                      fit_mean::Bool=true,
-                     fast::Bool=true,
+                     fast::Bool=false,
                      flags::Integer=FFTW.ESTIMATE,
                      timelimit::Real=Inf,
                      oversampling::Integer=5,

@@ -74,8 +74,8 @@ function _press_rybicki!(P, times::AbstractVector{<:Real}, y::AbstractVector{<:R
     S2w = tan_2ωτ .* C2w # = sin(2 * ωτ)
     Cw  = sqrt.((1 .+ C2w) ./ 2) # = cos(ωτ)
     Sw  = sign.(S2w) .* sqrt.((1 .- C2w) ./ 2) # = sin(ωτ)
-    return P .= ((Ch .* Cw .+ Sh .* Sw) .^ 2 ./ ((1 .+ C2 .* C2w .+ S2 .* S2w) ./ 2) .+
-                 (Sh .* Cw .- Ch .* Sw) .^ 2 ./ ((1 .- C2 .* C2w .- S2 .* S2w) ./ 2)) ./ YY
+    return P .= (Ch .* Cw .+ Sh .* Sw)  ./ sqrt.((1 .+ C2 .* C2w .+ S2 .* S2w)) .+
+                 1.0im*(Sh .* Cw .- Ch .* Sw) ./ sqrt.((1 .- C2 .* C2w .- S2 .* S2w))
 end
 
 function _press_rybicki_fit_mean!(P, times::AbstractVector{<:Real},
@@ -96,10 +96,10 @@ function _press_rybicki_fit_mean!(P, times::AbstractVector{<:Real},
     S2w = tan_2ωτ .* C2w # = sin(2 * ωτ)
     Cw  = sqrt.((1 .+ C2w) ./ 2) # = cos(ωτ)
     Sw  = sign.(S2w) .* sqrt.((1 .- C2w) ./ 2) # = sin(ωτ)
-    return P .= ((Ch .* Cw .+ Sh .* Sw) .^ 2 ./
-                 ((1 .+ C2 .* C2w .+ S2 .* S2w) ./ 2 .- (C .* Cw .+ S .* Sw) .^ 2) .+
-                 (Sh .* Cw .- Ch .* Sw) .^ 2 ./
-                 ((1 .- C2 .* C2w .- S2 .* S2w) ./ 2 .- (S .* Cw .- C .* Sw) .^ 2)) ./ YY
+    return P .= (Ch .* Cw .+ Sh .* Sw) .^ 2 ./
+                 sqrt.(2*((1 .+ C2 .* C2w .+ S2 .* S2w) ./ 2 .- (C .* Cw .+ S .* Sw) .^ 2)) .+
+                 1.0im*(Sh .* Cw .- Ch .* Sw) ./
+                 sqrt.(2*((1 .- C2 .* C2w .- S2 .* S2w) ./ 2 .- (S .* Cw .- C .* Sw) .^ 2))
 end
 
 _periodogram!(p::FastGLSPlan) =
