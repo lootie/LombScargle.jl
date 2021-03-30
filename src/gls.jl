@@ -15,7 +15,7 @@
 ### Code
 
 # GLS plan with real and imaginary parts 
-struct GLSPlanComplex{T,A,B<:AbstractVector{T},C,D,E,F,G} <: PeriodogramPlan
+struct GLSPlan{T,A,B<:AbstractVector{T},C,D,E,F,G} <: PeriodogramPlan
     times::A
     signal::B
     freq::C
@@ -28,7 +28,7 @@ struct GLSPlanComplex{T,A,B<:AbstractVector{T},C,D,E,F,G} <: PeriodogramPlan
     P::G
 end
 
-struct GLSPlanComplex_fit_mean{T,A,B<:AbstractVector{T},C,D,E,F,G,H} <: PeriodogramPlan
+struct GLSPlan_fit_mean{T,A,B<:AbstractVector{T},C,D,E,F,G,H} <: PeriodogramPlan
     times::A
     signal::B
     freq::C
