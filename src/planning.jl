@@ -18,7 +18,7 @@ function _plan_no_fast(times::AbstractVector{R1}, signal::AbstractVector{R2}, su
                        fit_mean::Bool, noise::Real,
                        normalization::Symbol) where {R1<:Real,R2<:Real,R3<:Real,R4<:Real}
     P_type = promote_type(float(R1), float(R2), float(R3), float(R4))
-    P = Vector{P_type}(undef, length(frequencies))
+    P = Vector{P_type}(undef, length(frequencies)) .+ 0.0im
     if fit_mean || with_errors
         # If "center_data" or "fit_mean" keywords are true,
         # subtract the weighted mean from each point.
