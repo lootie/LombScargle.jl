@@ -31,7 +31,7 @@ end
 #   Bibcode: http://adsabs.harvard.edu/abs/2010ApJS..191..247T)
 function _lombscargle_orig!(P::AbstractVector{T}, times::AbstractVector{<:Real},
                             X::AbstractVector{<:Real}, freqs::AbstractVector{<:Real},
-                            XX::Real) where {T<:Real}
+                            XX::Real) where {T<:Complex}
     N = length(X)
     @inbounds Threads.@threads for n in eachindex(freqs)
         ω = freqs[n] * 2 * pi
@@ -48,6 +48,11 @@ function _lombscargle_orig!(P::AbstractVector{T}, times::AbstractVector{<:Real},
         c_τ2     = c_τ*c_τ
         s_τ2     = s_τ*s_τ
         cs_τ_CS  = 2c_τ*s_τ*CS
+        #=
+        P[n] = sign(CC_τ)*(YC_τ)/sqrt(abs(2*CC_τ)) + 1.0im*sign(SS_τ)*(YS_τ)/sqrt(abs(2*SS_τ))
+        P[n]     = (c_τ*XC + s_τ*XS)/sqrt(2*((c_τ2*CC + cs_τ_CS + s_τ2*SS))) +
+                    1.0im*(c_τ*XS - s_τ*XC)/sqrt(2*(c_τ2*SS - cs_τ_CS + s_τ2*CC))
+        =#
         P[n]     = (c_τ*XC + s_τ*XS)/sqrt(2*((c_τ2*CC + cs_τ_CS + s_τ2*SS))) +
                     1.0im*(c_τ*XS - s_τ*XC)/sqrt(2*(c_τ2*SS - cs_τ_CS + s_τ2*CC))
     end
